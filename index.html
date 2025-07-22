@@ -703,11 +703,25 @@
             }
         }
 
-        // Load all CSV data using the optimized API endpoint
+        // Load all CSV data (works for both server and static hosting)
         async function loadAllData() {
             try {
-                const response = await fetch('/api/all-data');
-                if (!response.ok) throw new Error('Failed to fetch data');
+                let response;
+
+                // Try server API first (for Vercel/Node.js hosting)
+                try {
+                    response = await fetch('/api/all-data');
+                    if (!response.ok) throw new Error('Server API not available');
+                    console.log('✅ Loading data from server API');
+                } catch (serverError) {
+                    // Fallback to static JSON file (for GitHub Pages)
+                    console.log('🔄 Server API not available, trying static file...');
+                    response = await fetch('./data/all-data.json');
+                    if (!response.ok) {
+                        throw new Error(`Static file not found! status: ${response.status}`);
+                    }
+                    console.log('✅ Loading data from static file');
+                }
 
                 allData = await response.json();
 
@@ -721,8 +735,9 @@
                 });
 
                 filteredData = [...allData];
+                console.log(`📊 Loaded ${allData.length} records from ${colleges.size} colleges`);
             } catch (error) {
-                console.error('Error loading data:', error);
+                console.error('❌ Error loading data:', error);
                 throw error;
             }
         }
