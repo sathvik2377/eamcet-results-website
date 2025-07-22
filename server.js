@@ -14,12 +14,19 @@ app.use(express.static('.'));
 // Data directory
 const DATA_DIR = path.join(__dirname, '2025 phase 1 data');
 
+// Debug logging
+console.log('🔍 Current directory:', __dirname);
+console.log('📂 Data directory path:', DATA_DIR);
+console.log('📁 Data directory exists:', fs.existsSync(DATA_DIR));
+
 // API Routes
 
 // Get list of all colleges
 app.get('/api/colleges', (req, res) => {
     try {
+        console.log('📋 Getting colleges list...');
         if (!fs.existsSync(DATA_DIR)) {
+            console.log('❌ Data directory does not exist:', DATA_DIR);
             return res.json([]);
         }
 
@@ -28,9 +35,10 @@ app.get('/api/colleges', (req, res) => {
             .map(dirent => dirent.name)
             .sort();
 
+        console.log(`✅ Found ${colleges.length} colleges`);
         res.json(colleges);
     } catch (error) {
-        console.error('Error reading colleges:', error);
+        console.error('❌ Error reading colleges:', error);
         res.status(500).json({ error: 'Failed to read colleges' });
     }
 });
