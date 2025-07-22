@@ -403,14 +403,15 @@
         }
 
         /* Navigation buttons */
-        .nav-btn, .nav-btn-active {
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
+        .nav-btn, .nav-btn-active, .nav-btn-cutoff {
+            padding: 0.75rem 1.25rem;
+            border-radius: 30px;
             text-decoration: none;
-            font-weight: 500;
-            font-size: 0.875rem;
+            font-weight: 600;
+            font-size: 0.95rem;
             transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
         }
 
         .nav-btn {
@@ -423,12 +424,41 @@
             color: white;
             transform: translateY(-2px);
             border-color: rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
         }
 
         .nav-btn-active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border-color: rgba(102, 126, 234, 0.3);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-btn-cutoff {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+            font-size: 1rem;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 8px 25px rgba(240, 147, 251, 0.3);
+        }
+
+        .nav-btn-cutoff:hover {
+            background: linear-gradient(135deg, #e879f9 0%, #ef4444 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(240, 147, 251, 0.4);
+        }
+
+        /* Feature cards */
+        .feature-card {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
@@ -448,7 +478,21 @@
                         <p class="text-sm text-gray-400">Phase 1 Cutoffs Finder</p>
                     </div>
                 </div>
-                <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <a href="index.html" class="nav-btn-active flex items-center space-x-2">
+                            <span>🔍</span>
+                            <span>Search Results</span>
+                        </a>
+                        <a href="closing-ranks.html" class="nav-btn-cutoff flex items-center space-x-2">
+                            <span>📊</span>
+                            <span>Closing Ranks</span>
+                        </a>
+                        <a href="phase2-cutoffs.html" class="nav-btn-cutoff flex items-center space-x-2">
+                            <span>🎯</span>
+                            <span>Phase 2 Cutoffs</span>
+                        </a>
+                    </div>
                     <div class="hidden lg:flex items-center space-x-3">
                         <div id="totalRecords" class="stat-card text-sm">
                             <div class="spinner inline-block mr-2"></div>
@@ -458,11 +502,6 @@
                             <div class="spinner inline-block mr-2"></div>
                             Loading...
                         </div>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <a href="index.html" class="nav-btn-active">Search Results</a>
-                        <a href="closing-ranks.html" class="nav-btn">Closing Ranks</a>
-                        <a href="phase2-cutoffs.html" class="nav-btn">Phase 2 Cutoffs</a>
                     </div>
                 </div>
             </div>
@@ -496,36 +535,73 @@
             </div>
         </div>
 
-                <!-- Quick Search Examples -->
-                <div class="card p-6 mb-8 max-w-4xl mx-auto">
-                    <div class="text-center mb-6">
-                        <h2 class="text-xl font-semibold mb-3 gradient-text">Quick Search Examples</h2>
-                        <p class="text-gray-400 mb-4">Click any example to try it out</p>
-                    </div>
-                    <div class="flex flex-wrap justify-center gap-3">
-                        <button onclick="quickSearch('ram')" class="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm transition-all duration-300 hover:scale-105">
-                            "ram" <span class="text-gray-500">→ Ram Krishna</span>
-                        </button>
-                        <button onclick="quickSearch('krishna')" class="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm transition-all duration-300 hover:scale-105">
-                            "krishna"
-                        </button>
-                        <button onclick="quickSearch('priya')" class="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm transition-all duration-300 hover:scale-105">
-                            "priya"
-                        </button>
-                        <button onclick="quickSearch('2521')" class="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm transition-all duration-300 hover:scale-105">
-                            "2521" <span class="text-gray-500">Hall Ticket</span>
-                        </button>
-                        <button onclick="quickSearch('cbit')" class="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm transition-all duration-300 hover:scale-105">
-                            "cbit" <span class="text-gray-500">College</span>
-                        </button>
-                    </div>
+        <!-- Features Section -->
+        <div class="card p-8 mb-8 max-w-6xl mx-auto">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold mb-3 gradient-text">Complete EAMCET 2025 Results Platform</h2>
+                <p class="text-gray-400">Everything you need for EAMCET counseling in one place</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="feature-card p-6 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-white/10">
+                    <div class="text-3xl mb-4">🔍</div>
+                    <h3 class="text-lg font-semibold mb-2 text-white">Student Search</h3>
+                    <p class="text-gray-400 text-sm mb-4">Search through 77,000+ student records by name or hall ticket number with intelligent autocomplete</p>
+                    <ul class="text-xs text-gray-500 space-y-1">
+                        <li>• Smart partial name matching</li>
+                        <li>• Real-time suggestions</li>
+                        <li>• Filter by college & branch</li>
+                    </ul>
                 </div>
+                <div class="feature-card p-6 rounded-xl bg-gradient-to-br from-pink-500/10 to-red-500/10 border border-white/10">
+                    <div class="text-3xl mb-4">📊</div>
+                    <h3 class="text-lg font-semibold mb-2 text-white">Closing Ranks</h3>
+                    <p class="text-gray-400 text-sm mb-4">View Phase 1 closing ranks for all colleges, branches, and categories with sortable tables</p>
+                    <ul class="text-xs text-gray-500 space-y-1">
+                        <li>• All categories (OC, BC, SC, ST)</li>
+                        <li>• Sortable by any column</li>
+                        <li>• Filter by college/branch</li>
+                    </ul>
+                </div>
+                <div class="feature-card p-6 rounded-xl bg-gradient-to-br from-green-500/10 to-teal-500/10 border border-white/10">
+                    <div class="text-3xl mb-4">🎯</div>
+                    <h3 class="text-lg font-semibold mb-2 text-white">Phase 2 Predictions</h3>
+                    <p class="text-gray-400 text-sm mb-4">Predicted Phase 2 cutoffs based on official data and historical trends</p>
+                    <ul class="text-xs text-gray-500 space-y-1">
+                        <li>• Data-driven predictions</li>
+                        <li>• All engineering branches</li>
+                        <li>• Updated regularly</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
 
         <!-- Search and Filters Section -->
         <div class="card p-8 mb-8 max-w-4xl mx-auto">
             <div class="text-center mb-8">
                 <h2 class="text-2xl font-semibold mb-3 gradient-text">Search Student Results</h2>
-                <p class="text-gray-400">Enter student name, hall ticket number, or college name</p>
+                <p class="text-gray-400 mb-4">Enter student name, hall ticket number, or college name</p>
+
+                <!-- Quick Examples -->
+                <div class="flex flex-wrap justify-center gap-2 mb-6">
+                    <span class="text-sm text-gray-500 mr-2">Try:</span>
+                    <button onclick="quickSearch('ram')" class="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs transition-all duration-300 hover:scale-105">
+                        "ram"
+                    </button>
+                    <button onclick="quickSearch('krishna')" class="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs transition-all duration-300 hover:scale-105">
+                        "krishna"
+                    </button>
+                    <button onclick="quickSearch('priya')" class="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs transition-all duration-300 hover:scale-105">
+                        "priya"
+                    </button>
+                    <button onclick="quickSearch('2521')" class="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs transition-all duration-300 hover:scale-105">
+                        "2521"
+                    </button>
+                    <button onclick="quickSearch('cbit')" class="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs transition-all duration-300 hover:scale-105">
+                        "cbit"
+                    </button>
+                </div>
             </div>
 
             <!-- Search Bar -->
