@@ -11,6 +11,45 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('.'));
 
+// API endpoints for closing ranks and phase 2 cutoffs
+app.get('/api/closing-ranks', (req, res) => {
+    try {
+        console.log('📋 Getting closing ranks data...');
+        const dataPath = path.join(__dirname, 'data', 'closing-ranks.json');
+
+        if (!fs.existsSync(dataPath)) {
+            console.log('❌ Closing ranks data file not found:', dataPath);
+            return res.json([]);
+        }
+
+        const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+        console.log(`✅ Loaded ${data.length} closing ranks records`);
+        res.json(data);
+    } catch (error) {
+        console.error('❌ Error reading closing ranks:', error);
+        res.status(500).json({ error: 'Failed to read closing ranks data' });
+    }
+});
+
+app.get('/api/phase2-cutoffs', (req, res) => {
+    try {
+        console.log('📋 Getting Phase 2 cutoffs data...');
+        const dataPath = path.join(__dirname, 'data', 'phase2-cutoffs.json');
+
+        if (!fs.existsSync(dataPath)) {
+            console.log('❌ Phase 2 cutoffs data file not found:', dataPath);
+            return res.json([]);
+        }
+
+        const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+        console.log(`✅ Loaded ${data.length} Phase 2 cutoffs records`);
+        res.json(data);
+    } catch (error) {
+        console.error('❌ Error reading Phase 2 cutoffs:', error);
+        res.status(500).json({ error: 'Failed to read Phase 2 cutoffs data' });
+    }
+});
+
 // Data directory
 const DATA_DIR = path.join(__dirname, '2025 phase 1 data');
 

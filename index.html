@@ -401,6 +401,35 @@
             overflow-x: hidden;
             overflow-y: auto;
         }
+
+        /* Navigation buttons */
+        .nav-btn, .nav-btn-active {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            color: white;
+            transform: translateY(-2px);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-btn-active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: rgba(102, 126, 234, 0.3);
+        }
     </style>
 </head>
 <body class="modern-bg text-white">
@@ -419,14 +448,21 @@
                         <p class="text-sm text-gray-400">Phase 1 Cutoffs Finder</p>
                     </div>
                 </div>
-                <div class="hidden md:flex items-center space-x-3">
-                    <div id="totalRecords" class="stat-card text-sm">
-                        <div class="spinner inline-block mr-2"></div>
-                        Loading...
+                <div class="flex items-center space-x-3">
+                    <div class="hidden lg:flex items-center space-x-3">
+                        <div id="totalRecords" class="stat-card text-sm">
+                            <div class="spinner inline-block mr-2"></div>
+                            Loading...
+                        </div>
+                        <div id="totalColleges" class="stat-card text-sm">
+                            <div class="spinner inline-block mr-2"></div>
+                            Loading...
+                        </div>
                     </div>
-                    <div id="totalColleges" class="stat-card text-sm">
-                        <div class="spinner inline-block mr-2"></div>
-                        Loading...
+                    <div class="flex items-center space-x-2">
+                        <a href="index.html" class="nav-btn-active">Search Results</a>
+                        <a href="closing-ranks.html" class="nav-btn">Closing Ranks</a>
+                        <a href="phase2-cutoffs.html" class="nav-btn">Phase 2 Cutoffs</a>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EAMCET 2025 Phase 1 Closing Ranks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: #764ba2;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .page-title {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-title p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 70vh;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.3s ease;
+        }
+
+        th:hover {
+            background: #5a67d8;
+        }
+
+        th.sortable::after {
+            content: ' ↕';
+            opacity: 0.5;
+        }
+
+        th.sort-asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+
+        th.sort-desc::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:hover {
+            background-color: #f7fafc;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f7fafc;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .nav-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .page-title h1 {
+                font-size: 2rem;
+            }
+
+            .search-filters {
+                grid-template-columns: 1fr;
+            }
+
+            th, td {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo">EAMCET Results 2025</div>
+            <div class="nav-buttons">
+                <a href="index.html" class="nav-btn">Search Results</a>
+                <a href="closing-ranks.html" class="nav-btn active">Closing Ranks</a>
+                <a href="phase2-cutoffs.html" class="nav-btn">Phase 2 Cutoffs</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="page-title">
+            <h1>EAMCET 2025 Phase 1 Closing Ranks</h1>
+            <p>View closing ranks for all colleges and branches</p>
+        </div>
+
+        <div class="controls">
+            <div class="search-filters">
+                <div class="filter-group">
+                    <label for="collegeFilter">College</label>
+                    <input type="text" id="collegeFilter" placeholder="Search by college name...">
+                </div>
+                <div class="filter-group">
+                    <label for="branchFilter">Branch</label>
+                    <input type="text" id="branchFilter" placeholder="Search by branch name...">
+                </div>
+                <div class="filter-group">
+                    <label for="categoryFilter">Category</label>
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="OC">OC (Open Category)</option>
+                        <option value="BC_A">BC-A</option>
+                        <option value="BC_B">BC-B</option>
+                        <option value="BC_C">BC-C</option>
+                        <option value="BC_D">BC-D</option>
+                        <option value="BC_E">BC-E</option>
+                        <option value="SC">SC</option>
+                        <option value="ST">ST</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="stats">
+                <span id="recordCount">Loading...</span>
+                <span>Click column headers to sort</span>
+            </div>
+            <div class="table-wrapper">
+                <table id="closingRanksTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable" data-column="College Code">College Code</th>
+                            <th class="sortable" data-column="College Name">College Name</th>
+                            <th class="sortable" data-column="Branch Name">Branch Name</th>
+                            <th class="sortable" data-column="OC BOYS">OC Boys</th>
+                            <th class="sortable" data-column="OC GIRLS">OC Girls</th>
+                            <th class="sortable" data-column="BC_A BOYS">BC-A Boys</th>
+                            <th class="sortable" data-column="BC_A GIRLS">BC-A Girls</th>
+                            <th class="sortable" data-column="BC_B BOYS">BC-B Boys</th>
+                            <th class="sortable" data-column="BC_B GIRLS">BC-B Girls</th>
+                            <th class="sortable" data-column="BC_C BOYS">BC-C Boys</th>
+                            <th class="sortable" data-column="BC_C GIRLS">BC-C Girls</th>
+                            <th class="sortable" data-column="BC_D BOYS">BC-D Boys</th>
+                            <th class="sortable" data-column="BC_D GIRLS">BC-D Girls</th>
+                            <th class="sortable" data-column="BC_E BOYS">BC-E Boys</th>
+                            <th class="sortable" data-column="BC_E GIRLS">BC-E Girls</th>
+                            <th class="sortable" data-column="SC BOYS">SC Boys</th>
+                            <th class="sortable" data-column="SC GIRLS">SC Girls</th>
+                            <th class="sortable" data-column="ST BOYS">ST Boys</th>
+                            <th class="sortable" data-column="ST GIRLS">ST Girls</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="19" class="loading">Loading closing ranks data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allData = [];
+        let filteredData = [];
+        let currentSort = { column: null, direction: 'asc' };
+
+        // Load data (works for both server and static hosting)
+        async function loadData() {
+            try {
+                let response;
+
+                // Try server API first (for Node.js hosting)
+                try {
+                    response = await fetch('/api/closing-ranks');
+                    if (!response.ok) throw new Error('Server API not available');
+                    console.log('✅ Loading closing ranks from server API');
+                } catch (serverError) {
+                    // Fallback to static JSON file (for GitHub Pages)
+                    console.log('🔄 Server API not available, trying static file...');
+                    response = await fetch('./data/closing-ranks.json');
+                    if (!response.ok) {
+                        throw new Error(`Static file not found! status: ${response.status}`);
+                    }
+                    console.log('✅ Loading closing ranks from static file');
+                }
+
+                allData = await response.json();
+                filteredData = [...allData];
+
+                console.log(`📊 Loaded ${allData.length} closing ranks records`);
+                renderTable();
+                updateStats();
+
+            } catch (error) {
+                console.error('❌ Error loading data:', error);
+                document.getElementById('tableBody').innerHTML =
+                    '<tr><td colspan="19" class="error">Failed to load closing ranks data. Please refresh the page.</td></tr>';
+            }
+        }
+
+        // Render table
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            
+            if (filteredData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="19" style="text-align: center; padding: 2rem;">No records found matching your filters.</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = filteredData.map(row => `
+                <tr>
+                    <td>${row['College Code'] || ''}</td>
+                    <td>${row['College Name'] || ''}</td>
+                    <td>${row['Branch Name'] || ''}</td>
+                    <td>${formatRank(row['OC BOYS'])}</td>
+                    <td>${formatRank(row['OC GIRLS'])}</td>
+                    <td>${formatRank(row['BC_A BOYS'])}</td>
+                    <td>${formatRank(row['BC_A GIRLS'])}</td>
+                    <td>${formatRank(row['BC_B BOYS'])}</td>
+                    <td>${formatRank(row['BC_B GIRLS'])}</td>
+                    <td>${formatRank(row['BC_C BOYS'])}</td>
+                    <td>${formatRank(row['BC_C GIRLS'])}</td>
+                    <td>${formatRank(row['BC_D BOYS'])}</td>
+                    <td>${formatRank(row['BC_D GIRLS'])}</td>
+                    <td>${formatRank(row['BC_E BOYS'])}</td>
+                    <td>${formatRank(row['BC_E GIRLS'])}</td>
+                    <td>${formatRank(row['SC BOYS'])}</td>
+                    <td>${formatRank(row['SC GIRLS'])}</td>
+                    <td>${formatRank(row['ST BOYS'])}</td>
+                    <td>${formatRank(row['ST GIRLS'])}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Format rank display
+        function formatRank(rank) {
+            if (!rank || rank === 'NA' || rank === '') return 'NA';
+            if (typeof rank === 'number') return rank.toLocaleString();
+            return rank;
+        }
+
+        // Update stats
+        function updateStats() {
+            document.getElementById('recordCount').textContent = 
+                `Showing ${filteredData.length} of ${allData.length} records`;
+        }
+
+        // Filter data
+        function filterData() {
+            const collegeFilter = document.getElementById('collegeFilter').value.toLowerCase();
+            const branchFilter = document.getElementById('branchFilter').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            
+            filteredData = allData.filter(row => {
+                const collegeMatch = !collegeFilter || 
+                    (row['College Name'] && row['College Name'].toLowerCase().includes(collegeFilter)) ||
+                    (row['College Code'] && row['College Code'].toLowerCase().includes(collegeFilter));
+                
+                const branchMatch = !branchFilter || 
+                    (row['Branch Name'] && row['Branch Name'].toLowerCase().includes(branchFilter));
+                
+                let categoryMatch = true;
+                if (categoryFilter) {
+                    // Check if the selected category has any valid ranks (not NA)
+                    const boysRank = row[`${categoryFilter} BOYS`];
+                    const girlsRank = row[`${categoryFilter} GIRLS`];
+                    categoryMatch = (boysRank && boysRank !== 'NA') || (girlsRank && girlsRank !== 'NA');
+                }
+                
+                return collegeMatch && branchMatch && categoryMatch;
+            });
+            
+            renderTable();
+            updateStats();
+        }
+
+        // Sort data
+        function sortData(column) {
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = 'asc';
+            }
+            
+            // Update sort indicators
+            document.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+            
+            const currentTh = document.querySelector(`th[data-column="${column}"]`);
+            currentTh.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+            
+            filteredData.sort((a, b) => {
+                let aVal = a[column];
+                let bVal = b[column];
+                
+                // Handle numeric values
+                if (typeof aVal === 'number' && typeof bVal === 'number') {
+                    return currentSort.direction === 'asc' ? aVal - bVal : bVal - aVal;
+                }
+                
+                // Handle string values
+                aVal = String(aVal || '').toLowerCase();
+                bVal = String(bVal || '').toLowerCase();
+                
+                if (currentSort.direction === 'asc') {
+                    return aVal.localeCompare(bVal);
+                } else {
+                    return bVal.localeCompare(aVal);
+                }
+            });
+            
+            renderTable();
+        }
+
+        // Event listeners
+        document.getElementById('collegeFilter').addEventListener('input', filterData);
+        document.getElementById('branchFilter').addEventListener('input', filterData);
+        document.getElementById('categoryFilter').addEventListener('change', filterData);
+
+        // Sort event listeners
+        document.querySelectorAll('th.sortable').forEach(th => {
+            th.addEventListener('click', () => {
+                const column = th.getAttribute('data-column');
+                sortData(column);
+            });
+        });
+
+        // Load data on page load
+        loadData();
+    </script>
+</body>
+</html>
