@@ -328,12 +328,14 @@
         <div class="controls">
             <div class="search-filters">
                 <div class="filter-group">
-                    <label for="collegeFilter">College</label>
-                    <input type="text" id="collegeFilter" placeholder="Search by college name...">
+                    <label for="collegeFilter">College Code/Name</label>
+                    <input type="text" id="collegeFilter" placeholder="Enter college code (e.g., CBIT) or name...">
                 </div>
                 <div class="filter-group">
                     <label for="branchFilter">Branch</label>
-                    <input type="text" id="branchFilter" placeholder="Search by branch name...">
+                    <select id="branchFilter">
+                        <option value="">All Branches</option>
+                    </select>
                 </div>
                 <div class="filter-group">
                     <label for="categoryFilter">Category</label>
@@ -347,6 +349,14 @@
                         <option value="BC_E">BC-E</option>
                         <option value="SC">SC</option>
                         <option value="ST">ST</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="genderFilter">Gender</label>
+                    <select id="genderFilter">
+                        <option value="">All Genders</option>
+                        <option value="BOYS">Boys</option>
+                        <option value="GIRLS">Girls</option>
                     </select>
                 </div>
             </div>
@@ -396,6 +406,7 @@
         let allData = [];
         let filteredData = [];
         let currentSort = { column: null, direction: 'asc' };
+        let branches = new Set();
 
         // Load data (works for both server and static hosting)
         async function loadData() {
@@ -420,7 +431,15 @@
                 allData = await response.json();
                 filteredData = [...allData];
 
+                // Extract unique branches for dropdown
+                allData.forEach(record => {
+                    if (record['Branch Name']) {
+                        branches.add(record['Branch Name']);
+                    }
+                });
+
                 console.log(`📊 Loaded ${allData.length} closing ranks records`);
+                populateBranchDropdown();
                 renderTable();
                 updateStats();
 
@@ -429,6 +448,23 @@
                 document.getElementById('tableBody').innerHTML =
                     '<tr><td colspan="19" class="error">Failed to load closing ranks data. Please refresh the page.</td></tr>';
             }
+        }
+
+        // Populate branch dropdown
+        function populateBranchDropdown() {
+            const branchFilter = document.getElementById('branchFilter');
+
+            // Clear existing options except "All Branches"
+            branchFilter.innerHTML = '<option value="">All Branches</option>';
+
+            // Sort branches alphabetically and add to dropdown
+            const sortedBranches = Array.from(branches).sort();
+            sortedBranches.forEach(branch => {
+                const option = document.createElement('option');
+                option.value = branch;
+                option.textContent = branch;
+                branchFilter.appendChild(option);
+            });
         }
 
         // Render table
@@ -481,28 +517,47 @@
         // Filter data
         function filterData() {
             const collegeFilter = document.getElementById('collegeFilter').value.toLowerCase();
-            const branchFilter = document.getElementById('branchFilter').value.toLowerCase();
+            const branchFilter = document.getElementById('branchFilter').value;
             const categoryFilter = document.getElementById('categoryFilter').value;
-            
+            const genderFilter = document.getElementById('genderFilter').value;
+
             filteredData = allData.filter(row => {
-                const collegeMatch = !collegeFilter || 
+                // College match - works for both code and name
+                const collegeMatch = !collegeFilter ||
                     (row['College Name'] && row['College Name'].toLowerCase().includes(collegeFilter)) ||
                     (row['College Code'] && row['College Code'].toLowerCase().includes(collegeFilter));
-                
-                const branchMatch = !branchFilter || 
-                    (row['Branch Name'] && row['Branch Name'].toLowerCase().includes(branchFilter));
-                
+
+                // Branch match - exact match for dropdown selection
+                const branchMatch = !branchFilter || row['Branch Name'] === branchFilter;
+
+                // Category match - check if selected category has valid ranks
                 let categoryMatch = true;
                 if (categoryFilter) {
-                    // Check if the selected category has any valid ranks (not NA)
                     const boysRank = row[`${categoryFilter} BOYS`];
                     const girlsRank = row[`${categoryFilter} GIRLS`];
                     categoryMatch = (boysRank && boysRank !== 'NA') || (girlsRank && girlsRank !== 'NA');
                 }
-                
-                return collegeMatch && branchMatch && categoryMatch;
+
+                // Gender match - check if selected gender has valid ranks
+                let genderMatch = true;
+                if (genderFilter) {
+                    if (categoryFilter) {
+                        // If both category and gender are selected
+                        const rank = row[`${categoryFilter} ${genderFilter}`];
+                        genderMatch = rank && rank !== 'NA';
+                    } else {
+                        // If only gender is selected, check if any category has valid ranks for that gender
+                        const categories = ['OC', 'BC_A', 'BC_B', 'BC_C', 'BC_D', 'BC_E', 'SC', 'ST'];
+                        genderMatch = categories.some(cat => {
+                            const rank = row[`${cat} ${genderFilter}`];
+                            return rank && rank !== 'NA';
+                        });
+                    }
+                }
+
+                return collegeMatch && branchMatch && categoryMatch && genderMatch;
             });
-            
+
             renderTable();
             updateStats();
         }
@@ -549,8 +604,9 @@
 
         // Event listeners
         document.getElementById('collegeFilter').addEventListener('input', filterData);
-        document.getElementById('branchFilter').addEventListener('input', filterData);
+        document.getElementById('branchFilter').addEventListener('change', filterData);
         document.getElementById('categoryFilter').addEventListener('change', filterData);
+        document.getElementById('genderFilter').addEventListener('change', filterData);
 
         // Sort event listeners
         document.querySelectorAll('th.sortable').forEach(th => {
