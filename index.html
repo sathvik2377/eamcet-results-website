@@ -460,6 +460,22 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             border-color: rgba(255, 255, 255, 0.2);
         }
+
+        /* Mobile layout reordering */
+        @media (max-width: 768px) {
+            .features-section {
+                order: 2;
+            }
+
+            .search-section {
+                order: 1;
+            }
+
+            .main-container {
+                display: flex;
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body class="modern-bg text-white">
@@ -535,8 +551,9 @@
             </div>
         </div>
 
+        <div class="main-container">
         <!-- Features Section -->
-        <div class="card p-8 mb-8 max-w-6xl mx-auto">
+        <div class="card p-8 mb-8 max-w-6xl mx-auto features-section">
             <div class="text-center mb-8">
                 <h2 class="text-2xl font-bold mb-3 gradient-text">Complete EAMCET 2025 Results Platform</h2>
                 <p class="text-gray-400">Everything you need for EAMCET counseling in one place</p>
@@ -578,7 +595,7 @@
 
 
         <!-- Search and Filters Section -->
-        <div class="card p-8 mb-8 max-w-4xl mx-auto">
+        <div class="card p-8 mb-8 max-w-4xl mx-auto search-section">
             <div class="text-center mb-8">
                 <h2 class="text-2xl font-semibold mb-3 gradient-text">Search Student Results</h2>
                 <p class="text-gray-400 mb-4">Enter student name, hall ticket number, or college name</p>
@@ -632,7 +649,7 @@
                 <h3 class="text-lg font-semibold mb-3 text-gray-300">Filter Options</h3>
                 <p class="text-gray-400 mb-4">Narrow down your search with these filters</p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <select id="collegeFilter" class="px-4 py-3 search-input rounded-xl focus:outline-none transition-all duration-300">
                     <option value="">All Colleges</option>
                 </select>
@@ -641,6 +658,11 @@
                 </select>
                 <select id="categoryFilter" class="px-4 py-3 search-input rounded-xl focus:outline-none transition-all duration-300">
                     <option value="">All Categories</option>
+                </select>
+                <select id="genderFilter" class="px-4 py-3 search-input rounded-xl focus:outline-none transition-all duration-300">
+                    <option value="">All Genders</option>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
                 </select>
             </div>
         </div>
@@ -715,6 +737,7 @@
                 </div>
             </div>
         </div>
+        </div> <!-- End main-container -->
 
 
 
@@ -782,6 +805,7 @@
         const collegeFilter = document.getElementById('collegeFilter');
         const branchFilter = document.getElementById('branchFilter');
         const categoryFilter = document.getElementById('categoryFilter');
+        const genderFilter = document.getElementById('genderFilter');
         const loadingIndicator = document.getElementById('loadingIndicator');
         const searchResultsList = document.getElementById('searchResultsList');
         const resultsList = document.getElementById('resultsList');
@@ -953,6 +977,7 @@
             collegeFilter.addEventListener('change', performSearch, { passive: true });
             branchFilter.addEventListener('change', performSearch, { passive: true });
             categoryFilter.addEventListener('change', performSearch, { passive: true });
+            genderFilter.addEventListener('change', performSearch, { passive: true });
             exportBtn.addEventListener('click', exportResults, { passive: true });
 
 
@@ -1354,6 +1379,7 @@
             const selectedCollege = collegeFilter.value;
             const selectedBranch = branchFilter.value;
             const selectedCategory = categoryFilter.value;
+            const selectedGender = genderFilter.value;
 
             filteredData = allData.filter(record => {
                 let matchesSearch = true;
@@ -1396,19 +1422,34 @@
                 const matchesBranch = !selectedBranch || record.branch === selectedBranch;
                 const matchesCategory = !selectedCategory || record.seatcategory === selectedCategory;
 
-                return matchesSearch && matchesCollege && matchesBranch && matchesCategory;
+                // Gender filtering (M for Male, F for Female)
+                const matchesGender = !selectedGender || record.gender === selectedGender;
+
+                return matchesSearch && matchesCollege && matchesBranch && matchesCategory && matchesGender;
             });
 
-            // Sort results by relevance
+            // Sort results by relevance and rank
             if (searchTerm) {
                 filteredData.sort((a, b) => {
                     const aScore = calculateRelevanceScore(a, searchTerm);
                     const bScore = calculateRelevanceScore(b, searchTerm);
-                    return bScore - aScore; // Higher score first
+
+                    // If relevance scores are very close, prioritize better rank
+                    if (Math.abs(aScore - bScore) < 0.1) {
+                        const aRank = parseInt(a.rank) || 999999;
+                        const bRank = parseInt(b.rank) || 999999;
+                        return aRank - bRank; // Better rank first
+                    }
+
+                    return bScore - aScore; // Higher relevance score first
                 });
             } else {
-                // Sort by rank when no search term
-                filteredData.sort((a, b) => parseInt(a.rank) - parseInt(b.rank));
+                // Sort by rank when no search term (better ranks first)
+                filteredData.sort((a, b) => {
+                    const aRank = parseInt(a.rank) || 999999;
+                    const bRank = parseInt(b.rank) || 999999;
+                    return aRank - bRank;
+                });
             }
 
             displayResults();
@@ -1506,6 +1547,14 @@
             if (name.includes(searchTerm)) {
                 score += Math.max(0, 20 - name.length);
             }
+
+            // Add rank-based bonus (better ranks get higher scores)
+            const rank = parseInt(record.rank) || 999999;
+            if (rank <= 1000) score += 10;      // Top 1000 ranks
+            else if (rank <= 5000) score += 8;  // Top 5000 ranks
+            else if (rank <= 10000) score += 5; // Top 10000 ranks
+            else if (rank <= 25000) score += 3; // Top 25000 ranks
+            else if (rank <= 50000) score += 1; // Top 50000 ranks
 
             return score;
         }
